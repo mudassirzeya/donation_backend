@@ -12,7 +12,7 @@ from rest_framework.authtoken.models import Token
 from django.core.paginator import Paginator, EmptyPage
 from django.contrib import messages
 from django.db.models import Q
-from sqlalchemy import JSON
+# from sqlalchemy import JSON
 from .models import Member_Donation, Member_Info, Remark_Member, UserProfile
 from .serializers import DonationSerializer, MemberSerializer, RemarkSerializer
 import json
