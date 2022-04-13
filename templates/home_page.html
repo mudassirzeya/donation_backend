@@ -1,0 +1,130 @@
+{% extends "user_base.html" %}
+{% block content %}
+<!-- <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css"> -->
+<style>
+    .social-link {
+        width: 30px;
+        height: 30px;
+        border: 1px solid #ddd;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        color: #666;
+        border-radius: 50%;
+        transition: all 0.3s;
+        font-size: 0.9rem;
+    }
+
+    .social-link:hover,
+    .social-link:focus {
+        background: #ddd;
+        text-decoration: none;
+        color: #555;
+    }
+</style>
+<br>
+<h1 class="text-center text-info">Search Here for any Contacts.</h1>
+{% if staffProfile.user_type == 'admin' %}
+<div class="float-right">
+    <a href="{% url 'admin_page' %}" class="btn btn-success">Go to Admin Pannel</a>
+</div>
+{% endif %}
+<div class="main container">
+
+    <!-- Another variation with a button -->
+    <div class="m-5">
+        <div class="form-group">
+            <form action="{% url 'home_page' %}" method="get">
+                <input type="text" class="form-control" placeholder="Search here for contacts" name="text">
+                <br>
+                <div class="text-center">
+                    <button class="btn btn-success" type="submit">
+                        <i class="fa fa-search"></i>&nbsp; Search
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <div class="container">
+        <div class="row text-center">
+            {% for list in filtered_list %}
+            <a href="{% url 'contact_profile' list.id %}">
+                <div class="col-xl-3 col-sm-6 mb-5">
+                    <div class="card bg-light">
+                        <div class="rounded shadow-sm py-5 px-4">
+                            <img src="https://ui-avatars.com/api/?background=0D8ABC&color=fff&name={{list.name}}" alt=""
+                                width="100" class="img-fluid rounded-circle mb-3 img-thumbnail shadow-sm">
+                            <h5 class="mb-0">{{list.name}}</h5><span class="small text-uppercase text-muted">
+                                {{list.designation}} {{list.department}} {{list.company}}</span>
+                            <ul class="social mb-0 list-inline mt-3">
+                                {% if list.phone_is_whatsapp != 'no' %}
+                                <li class="list-inline-item">
+                                    <button class="social-link text-success" id="{{list.phone}}"
+                                        onclick="whatsappNum(this)">
+                                        <i class="fab fa-whatsapp"></i>
+                                    </button>
+                                </li>
+                                {% endif %}
+                                {% if list.phone %}
+                                <li class="list-inline-item"><a href="tel:{{list.phone}}"
+                                        class="social-link text-primary"><i class="fa fa-phone"></i></a>
+                                </li>
+                                {% endif %}
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+            </a>
+            {% endfor %}
+        </div>
+    </div>
+
+    <div class="row justify-content-center">
+        <div>
+            {% if text %}
+            {% if filtered_list.has_previous %}
+            <a class="btn btn-primary m-3"
+                href="{% url 'home' %}?page={{filtered_list.previous_page_number}}&text={{text}}">
+                <i class=" fas fa-angle-double-left"></i> Previous Page</a>
+            {% endif %}
+            {% else %}
+            {% if filtered_list.has_previous %}
+            <a class="btn btn-primary m-3" href="{% url 'home' %}?page={{filtered_list.previous_page_number}}">
+                <i class=" fas fa-angle-double-left"></i> Previous Page</a>
+            {% endif %}
+            {% endif %}
+
+
+            {% if text %}
+            {% if filtered_list.has_next %}
+            <a class="btn btn-success" href="{% url 'home' %}?page={{filtered_list.next_page_number}}&text={{text}}">
+                Next Page
+                <i class=" fas fa-angle-double-right"></i></a>
+            {% endif %}
+            {% else %}
+            {% if filtered_list.has_next %}
+            <a class="btn btn-success" href="{% url 'home' %}?page={{filtered_list.next_page_number}}">Next Page
+                <i class=" fas fa-angle-double-right"></i></a>
+            {% endif %}
+            {% endif %}
+        </div>
+    </div>
+
+</div>
+
+<script>
+    const whatsappNum = (t) => {
+        const txt = t.id;
+        console.log("num", txt)
+        const numb = txt.match(/\d/g);
+        console.log("what", numb)
+        const ten_dig = numb.join("");
+        const final_numb = ten_dig.slice(-10);
+        console.log(final_numb);
+        window.open(`//api.whatsapp.com/send?phone=91${final_numb}&text=Hello`)
+        // return final_numb;
+    }
+</script>
+
+{% endblock %}

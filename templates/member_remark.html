@@ -1,0 +1,37 @@
+{% extends "base.html" %}
+{% block content %}
+<!-- <div class="float-right">
+    <button class="btn btn-warning text-white" data-toggle="modal" data-target="#add_user_modal"><i
+            class="fas fa-plus"></i> Add New User</button> -->
+<!-- </div> -->
+<div class="table-responsive">
+    <table class="table table-hover table-bordered" id="file_export">
+        <thead>
+            <tr>
+                <th>Report From</th>
+                <th>Member</th>
+                <th>Report Note</th>
+                <th>Date & Time</th>
+                <th></th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for report in remarks %}
+            <tr>
+                {% if report.remark_by.first_name %}
+                    <td>{{report.remark_by.first_name}}</td>
+                {% else %}
+                    <td>{{report.remark_by.username}}</td>
+                {% endif %}
+                <td>{{report.member.name}}</td>
+                <td>{{report.report_note}}</td>
+                <td>{{report.added_date}}</td>
+                <td><a class="" href="">Delete Remark &nbsp;<i class="fas fa-trash text-danger"></i></a></td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
+
+
+{% endblock %}
