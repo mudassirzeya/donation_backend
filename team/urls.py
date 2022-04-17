@@ -1,5 +1,5 @@
 from django.urls import path
-from .views import login_page, admin_page, home_page, logout_user, members_info_page, member_remark, mobile_user_page, admin_team_page, delete_member, send_member_data, edit_member_info, member_search_mobile, member_create_mobile, member_remark_mobile, member_donation_mobile, mobile_login
+from .views import login_page, admin_page, home_page, logout_user, members_info_page, member_remark, mobile_user_page, admin_team_page, delete_member, send_member_data, edit_member_info, member_search_mobile, member_create_mobile, member_remark_mobile, member_donation_mobile, mobile_login, user_donation_report, money_overflow_page
 
 from django.conf import settings
 from django.conf.urls.static import static
@@ -11,6 +11,7 @@ urlpatterns = [
     path('logout/', logout_user, name='logout'),
     path('admin_page/', admin_page, name='admin_page'),
     path('members/', members_info_page, name='members'),
+    path('money_overflow/', money_overflow_page, name='money_overflow'),
     path('send_member_data/', send_member_data, name='send_member_data'),
     path('edit_member_info/', edit_member_info, name='edit_member_info'),
     path('delete_member/', delete_member, name='delete_member'),
@@ -26,6 +27,8 @@ urlpatterns = [
          name='member_remark_mobile'),
     path('member_donation_mobile/', member_donation_mobile,
          name='member_donation_mobile'),
+    path('user_donation_report/', user_donation_report,
+         name='user_donation_report'),
 ]
 
 urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)

@@ -1,4 +1,3 @@
-from tkinter import image_names
 from django.shortcuts import render, redirect
 from django.contrib.auth import authenticate, login, logout
 from django.contrib.auth.decorators import login_required
@@ -11,10 +10,9 @@ from django.http import JsonResponse
 from rest_framework.authtoken.models import Token
 from django.core.paginator import Paginator, EmptyPage
 from django.contrib import messages
-from django.db.models import Q
-from sqlalchemy import JSON
-from .models import Member_Donation, Member_Info, Remark_Member, UserProfile
-from .serializers import DonationSerializer, MemberSerializer, RemarkSerializer
+from django.db.models import Q, Sum
+from .models import Donation_Collection_Status, Member_Donation, Member_Info, Remark_Member, UserProfile
+from .serializers import DonationSerializer, MemberSerializer, RemarkSerializer, UserSerializer
 import json
 # Create your views here.
 
@@ -54,8 +52,10 @@ def mobile_login(request):
         # print("user", account_user)
         if account_user is not None:
             login(request, account_user)
+            print("name: ", account_user.first_name)
+            username = account_user.first_name
             token = Token.objects.get_or_create(user=account_user)[0].key
-            return Response({'token': token, 'msg': 'success'})
+            return Response({'token': token, 'msg': 'success', 'username': username})
         else:
             return Response({'msg': 'failed'})
     else:
@@ -275,6 +275,42 @@ def admin_team_page(request):
     return render(request, 'admin_team.html', context)
 
 
+@login_required(login_url='user_login')
+def money_overflow_page(request):
+    if request.method == 'POST':
+        date = request.POST.get("date")
+        amount = request.POST.get("amount")
+        given_to_id = request.POST.get("givento")
+        given_by_id = request.POST.get("givenby")
+        print('overflow', given_by_id, given_to_id)
+        note = request.POST.get("note")
+
+        try:
+            given_by = User.objects.get(id=int(given_by_id))
+        except Exception:
+            given_by = None
+
+        try:
+            given_to = User.objects.get(id=int(given_to_id))
+        except Exception:
+            given_to = None
+
+        print('overflow', amount, given_by, given_to, note, date)
+        Donation_Collection_Status.objects.create(
+            amount=amount,
+            given_by=given_by,
+            given_to=given_to,
+            note=note,
+            added_date=date
+        )
+        return redirect('money_overflow')
+
+    received_money = Donation_Collection_Status.objects.all()
+    all_users = User.objects.all()
+    context = {"received_money": received_money, 'users': all_users}
+    return render(request, 'money_overflow.html', context)
+
+
 @api_view(['POST'])
 @permission_classes([IsAuthenticated])
 def member_search_mobile(request):
@@ -360,8 +396,10 @@ def member_remark_mobile(request):
         member_remarks = Remark_Member.objects.filter(member=member)
         print('member', member)
         remarks_json = RemarkSerializer(member_remarks, many=True)
+        users = User.objects.all()
+        user_json = UserSerializer(users, many=True)
         if member_remarks:
-            return Response({'msg': 'yes', 'data': remarks_json.data})
+            return Response({'msg': 'yes', 'data': remarks_json.data, 'users': user_json.data})
         else:
             return Response({'msg': 'no'})
         # return Response({"msg": "success", "data": remarks_json.data})
@@ -378,12 +416,14 @@ def member_donation_mobile(request):
         userid = data['uid']
         date_time = data['date']
         note = data['body']
+        account = data['account']
         member = Member_Info.objects.get(id=int(userid))
         Member_Donation.objects.create(
             received_by=user,
             member=member,
             amount=money,
             note=note,
+            account=account,
             added_date=date_time
         )
         print("data", data)
@@ -400,4 +440,42 @@ def member_donation_mobile(request):
         else:
             return Response({'msg': 'no'})
         # return Response({"msg": "success", "data": remarks_json.data})
+    return Response({"msg": "failed"})
+
+
+@api_view(['POST', 'GET'])
+@permission_classes([IsAuthenticated])
+def user_donation_report(request):
+    user = request.user
+    if request.method == 'GET':
+        print("report data")
+        my_donation = Member_Donation.objects.filter(received_by=user)
+        try:
+            total_donation = my_donation.aggregate(Sum('amount'))
+        except Exception:
+            total_donation = 0
+        print('total', total_donation)
+        try:
+            my_account_donation = my_donation.filter(
+                account='personal').aggregate(Sum('amount'))
+        except Exception:
+            my_account_donation = 0
+        print('my account', my_account_donation)
+
+        try:
+            sumbitted_donation = Donation_Collection_Status.objects.filter(
+                given_by=user).aggregate(Sum('amount'))
+        except Exception:
+            sumbitted_donation = 0
+        print('submitted amount', sumbitted_donation)
+
+        try:
+            remaining_amount = int(
+                my_account_donation['amount__sum'])-int(sumbitted_donation['amount__sum'])
+        except Exception:
+            remaining_amount = 0
+        return Response({'msg': 'yes', 'total_amount': total_donation,
+                         'personal_account_donation': my_account_donation,
+                         'submitted_donation': sumbitted_donation,
+                         'remaining_amount': remaining_amount})
     return Response({"msg": "failed"})

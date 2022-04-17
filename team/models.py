@@ -24,11 +24,6 @@ class UserProfile(models.Model):
         return str(self.user)
 
 
-class Member_Profile_Photo(models.Model):
-    profile_pic = models.ImageField(
-        default="profile1.jpg", null=True, blank=True)
-
-
 class Member_Info(models.Model):
     profile_pic = models.ImageField(
         default="profile1.jpg", null=True, blank=True)
@@ -59,6 +54,18 @@ class Member_Donation(models.Model):
     )
     member = models.ForeignKey(
         Member_Info, null=True, blank=True, on_delete=models.CASCADE)
-    amount = models.CharField(max_length=100, null=True, blank=True)
+    amount = models.PositiveBigIntegerField(null=True, blank=True)
+    note = models.CharField(max_length=500, null=True, blank=True)
+    account = models.CharField(max_length=15, null=True, blank=True)
+    added_date = models.DateTimeField(blank=True, null=True)
+
+
+class Donation_Collection_Status(models.Model):
+    amount = models.PositiveBigIntegerField(null=True, blank=True)
+    given_by = models.ForeignKey(
+        User, null=True, blank=True, on_delete=models.CASCADE)
+    given_to = models.ForeignKey(
+        User, related_name='user_model', null=True, blank=True,
+        on_delete=models.CASCADE)
     note = models.CharField(max_length=500, null=True, blank=True)
     added_date = models.DateTimeField(blank=True, null=True)
