@@ -69,3 +69,8 @@ class Donation_Collection_Status(models.Model):
         on_delete=models.CASCADE)
     note = models.CharField(max_length=500, null=True, blank=True)
     added_date = models.DateTimeField(blank=True, null=True)
+
+
+class Presentation(models.Model):
+    title = models.CharField(max_length=500, null=True, blank=True)
+    link = models.CharField(max_length=200, null=True, blank=True)
