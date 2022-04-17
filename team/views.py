@@ -11,8 +11,8 @@ from rest_framework.authtoken.models import Token
 from django.core.paginator import Paginator, EmptyPage
 from django.contrib import messages
 from django.db.models import Q, Sum
-from .models import Donation_Collection_Status, Member_Donation, Member_Info, Remark_Member, UserProfile
-from .serializers import DonationSerializer, MemberSerializer, RemarkSerializer, UserSerializer
+from .models import Donation_Collection_Status, Member_Donation, Member_Info, Presentation, Remark_Member, UserProfile
+from .serializers import DonationSerializer, MemberSerializer, PresentationSerializer, RemarkSerializer, UserSerializer
 from django.db.models import Q
 # from sqlalchemy import JSON
 from .models import Member_Donation, Member_Info, Remark_Member, UserProfile
@@ -322,6 +322,22 @@ def all_donation(request):
     return render(request, 'donation_page.html', context)
 
 
+@login_required(login_url='user_login')
+def presentation_page(request):
+    if request.method == 'POST':
+        title = request.POST.get("title")
+        link = request.POST.get("link")
+
+        Presentation.objects.create(
+            title=title,
+            link=link
+        )
+        return redirect('presentations')
+    presentations = Presentation.objects.all()
+    context = {'presentations': presentations}
+    return render(request, 'presentation.html', context)
+
+
 @api_view(['POST'])
 @permission_classes([IsAuthenticated])
 def member_search_mobile(request):
@@ -490,3 +506,15 @@ def user_donation_report(request):
                          'submitted_donation': sumbitted_donation,
                          'remaining_amount': remaining_amount})
     return Response({"msg": "failed"})
+
+
+@api_view(['POST', 'GET'])
+@permission_classes([IsAuthenticated])
+def presentation_mobile(request):
+    if request.method == 'GET':
+        presentations = Presentation.objects.all()
+        presentation_json = PresentationSerializer(presentations, many=True)
+        if presentations:
+            return Response({'msg': 'yes', 'data': presentation_json.data})
+        else:
+            return Response({'msg': 'no'})

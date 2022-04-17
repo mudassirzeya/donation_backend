@@ -1,5 +1,5 @@
 from rest_framework.serializers import ModelSerializer
-from .models import Member_Info, Remark_Member, Member_Donation
+from .models import Member_Info, Remark_Member, Member_Donation, Presentation
 from django.contrib.auth.models import User
 # from rest_framework.authtoken.models import Token
 
@@ -25,4 +25,10 @@ class RemarkSerializer(ModelSerializer):
 class DonationSerializer(ModelSerializer):
     class Meta:
         model = Member_Donation
+        fields = '__all__'
+
+
+class PresentationSerializer(ModelSerializer):
+    class Meta:
+        model = Presentation
         fields = '__all__'
