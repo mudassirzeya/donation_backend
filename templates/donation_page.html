@@ -1,0 +1,37 @@
+{% extends "base.html" %}
+{% block content %}
+<!-- <div class="float-right">
+    <button class="btn btn-warning text-white" data-toggle="modal" data-target="#add_user_modal"><i
+            class="fas fa-plus"></i> Add New User</button> -->
+<!-- </div> -->
+<div class="table-responsive">
+    <table class="table table-hover table-bordered" id="file_export">
+        <thead>
+            <tr>
+                <th>Received By</th>
+                <th>Member</th>
+                <th>Amount</th>
+                <th>Note</th>
+                <th>Account</th>
+                <th>Date</th>
+                <th></th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for donation in donations %}
+            <tr>
+                <td>{{donation.received_by.username}}</td>
+                <td>{{donation.member.mobile_number}}</td>
+                <td>{{donation.amount}}</td>
+                <td>{{donation.note}}</td>
+                <td>{{donation.account}}</td>
+                <td>{{donation.added_date}}</td>
+                <td><a class="" href="">Delete &nbsp;<i class="fas fa-trash text-danger"></i></a></td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
+
+
+{% endblock %}
