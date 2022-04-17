@@ -1,7 +1,3 @@
-<<<<<<< HEAD
-=======
-# from tkinter import image_names
->>>>>>> d868c08ae281ded88b9d38bc10facabb70c3b3d0
 from django.shortcuts import render, redirect
 from django.contrib.auth import authenticate, login, logout
 from django.contrib.auth.decorators import login_required
@@ -14,16 +10,13 @@ from django.http import JsonResponse
 from rest_framework.authtoken.models import Token
 from django.core.paginator import Paginator, EmptyPage
 from django.contrib import messages
-<<<<<<< HEAD
 from django.db.models import Q, Sum
 from .models import Donation_Collection_Status, Member_Donation, Member_Info, Remark_Member, UserProfile
 from .serializers import DonationSerializer, MemberSerializer, RemarkSerializer, UserSerializer
-=======
 from django.db.models import Q
 # from sqlalchemy import JSON
 from .models import Member_Donation, Member_Info, Remark_Member, UserProfile
 from .serializers import DonationSerializer, MemberSerializer, RemarkSerializer
->>>>>>> d868c08ae281ded88b9d38bc10facabb70c3b3d0
 import json
 # Create your views here.
 
